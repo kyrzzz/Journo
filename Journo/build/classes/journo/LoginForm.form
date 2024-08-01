@@ -33,7 +33,7 @@
                   <Component id="btnLogin" alignment="1" min="-2" pref="123" max="-2" attributes="0"/>
                   <Component id="lblRegister" pref="219" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace pref="507" max="32767" attributes="0"/>
+              <EmptySpace pref="53" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
