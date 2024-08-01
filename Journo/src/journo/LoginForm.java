@@ -11,6 +11,7 @@ package journo;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.SwingUtilities;
 
 public class LoginForm extends javax.swing.JFrame {
     private UserAuth userAuth;
@@ -33,6 +34,14 @@ public class LoginForm extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Login successful!\n\nLogged in as: " + userAuth.getCurrentUsername());
                     //JOptionPane.showMessageDialog(null, "Logged in as: " + userAuth.getCurrentUsername());
                     // Proceed to the next part of your application
+                                        SwingUtilities.invokeLater(new Runnable(){
+                    public void run(){
+                        String USERNAME = username;
+                        new Dashboard().setVisible(true);
+                        }
+                    });
+                    dispose();
+                
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid username or password.");
                 }
