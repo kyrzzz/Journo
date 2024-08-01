@@ -37,7 +37,7 @@ public class LoginForm extends javax.swing.JFrame {
                                         SwingUtilities.invokeLater(new Runnable(){
                     public void run(){
                         String USERNAME = username;
-                        new Dashboard().setVisible(true);
+                        new Dashboard(userAuth).setVisible(true);
                         }
                     });
                     dispose();
