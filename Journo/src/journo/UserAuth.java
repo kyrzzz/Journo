@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import javax.swing.JOptionPane;
 
 public class UserAuth {
     private int currentUserId;
@@ -31,17 +30,9 @@ public class UserAuth {
     }
 
     public boolean register(String username, String password, String email) {
-        // Check if username or password is empty
-        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Username and password cannot be empty.", "Registration Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-
         if (usernameExists(username)) {
-            JOptionPane.showMessageDialog(null, "Username already exists.", "Registration Error", JOptionPane.ERROR_MESSAGE);
             return false; // Username already exists
         }
-        
         String hashedPassword = PasswordUtil.hashPassword(password);
         String query = "INSERT INTO Users (username, password_hash, email) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -64,9 +55,6 @@ public class UserAuth {
         }
         return false;
     }
-
-
-
 
     private boolean usernameExists(String username) {
         String query = "SELECT user_id FROM Users WHERE username = ?";
