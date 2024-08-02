@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 public class UserAuth {
-    private int currentUserId;
+    public int currentUserId;
 
     public boolean login(String username, String password) {
         String query = "SELECT user_id, password_hash FROM Users WHERE username = ?";

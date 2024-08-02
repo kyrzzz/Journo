@@ -515,31 +515,38 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
     
-        private void loadJournals(boolean onlyCurrentUser) {
-        journalListModel.clear();
-        journalIds = new ArrayList<>();
-        String query = "SELECT journal_id, title FROM journals WHERE is_public = 1";
-        if (onlyCurrentUser) {
-            query += " AND user_id = ?";
-        }
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            if (onlyCurrentUser) {
-                stmt.setInt(1, userAuth.getCurrentUserId());
-            }
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                journalIds.add(rs.getInt("journal_id"));
-                journalListModel.addElement(rs.getString("title"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        private void loadJournals(boolean showOnlyPersonal) {
+    journalListModel.clear();
+    journalIds = new ArrayList<>();
+    String query;
+    if (showOnlyPersonal) {
+        query = "SELECT journal_id, title FROM Journals WHERE user_id = ?"; // Show only personal entries
+    } else {
+        query = "SELECT journal_id, title FROM Journals WHERE is_public = 1"; // Show only public entries
     }
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+        if (showOnlyPersonal) {
+            stmt.setInt(1, userAuth.currentUserId); // Filter by the user's ID if showing personal entries
+        }
+
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            int journalId = rs.getInt("journal_id");
+            String title = rs.getString("title");
+            journalListModel.addElement(title);
+            journalIds.add(journalId);
+        }
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "An error occurred while loading journals.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
         private void loadJournalEntry(int journalId) {
-        String query = "SELECT title, content, user_id FROM Journals WHERE journal_id = ?";
+        String query = "SELECT title, content, user_id FROM Journals WHERE journal_id = ?"; 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
