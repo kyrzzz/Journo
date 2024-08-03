@@ -83,12 +83,14 @@ public class Dashboard extends javax.swing.JFrame {
 
         tblList.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
+        txtJournalEntry.setEditable(false);
         txtJournalEntry.setColumns(20);
         txtJournalEntry.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtJournalEntry.setLineWrap(true);
         txtJournalEntry.setRows(5);
         jScrollPane3.setViewportView(txtJournalEntry);
 
+        txtJournalTitle.setEditable(false);
         txtJournalTitle.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -529,6 +531,7 @@ public class Dashboard extends javax.swing.JFrame {
                 txtTitle.setText("");
                 txtContent.setText("");
                 chkVisibility.setSelected(false);
+                loadJournals(false);
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to save journal entry.", "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -590,11 +593,15 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
     
-    private void lstJournalsValueChanged(javax.swing.event.ListSelectionEvent evt) {
+private void lstJournalsValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selectedIndex = lstJournals.getSelectedIndex();
     if (selectedIndex != -1) {
         int journalId = journalIds.get(selectedIndex);
-        String query = "SELECT j.title, j.content, u.username, j.date_created FROM Journals j JOIN Users u ON j.user_id = u.user_id WHERE j.journal_id = ?";
+
+        // Query to get the journal details and author information
+        String query = "SELECT j.title, j.content, u.username, j.date_created, j.user_id " +
+                       "FROM Journals j JOIN Users u ON j.user_id = u.user_id " +
+                       "WHERE j.journal_id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -607,15 +614,34 @@ public class Dashboard extends javax.swing.JFrame {
                     txtJournalEntry.setText(rs.getString("content"));
                     lblAuthor.setText("Author: " + rs.getString("username"));
                     lblTimestamp.setText("Timestamp: " + rs.getTimestamp("date_created").toString());
+
+                    // Check if the journal belongs to the current user
+                    boolean isCurrentUserEntry = rs.getInt("user_id") == userAuth.getCurrentUserId();
+
+                    // Enable or disable buttons based on ownership
+                    btnEdit.setEnabled(isCurrentUserEntry);
+                    btnDelete.setEnabled(isCurrentUserEntry);
+                    btnSave.setEnabled(false); // Always disable Save
+                    btnCancel.setEnabled(false); // Always disable Cancel
+
+                    // Make text fields non-editable
+                    txtJournalTitle.setEditable(false);
+                    txtJournalEntry.setEditable(false);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    } else {
+        // If no selection, disable all buttons and make text fields non-editable
+        btnEdit.setEnabled(false);
+        btnDelete.setEnabled(false);
+        btnSave.setEnabled(false);
+        btnCancel.setEnabled(false);
+        txtJournalTitle.setEditable(false);
+        txtJournalEntry.setEditable(false);
     }
 }
- 
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDelete;
