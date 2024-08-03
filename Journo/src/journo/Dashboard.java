@@ -24,8 +24,6 @@ public class Dashboard extends javax.swing.JFrame {
      */
     public Dashboard(UserAuth userAuth) {
         this.userAuth = userAuth;
-        this.journalIds = new ArrayList<>();
-        this.journalListModel = new DefaultListModel<>();
         initComponents();
         initCustomComponents();
         loadJournals(false); 
@@ -58,8 +56,6 @@ public class Dashboard extends javax.swing.JFrame {
         txtJournalTitle = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        lblTimestamp = new javax.swing.JLabel();
-        lblAuthor = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         lstJournals = new javax.swing.JList<>();
         jPanel1 = new javax.swing.JPanel();
@@ -97,10 +93,6 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setText("Journal Title:");
 
-        lblTimestamp.setText("Date");
-
-        lblAuthor.setText("Author");
-
         javax.swing.GroupLayout tblListLayout = new javax.swing.GroupLayout(tblList);
         tblList.setLayout(tblListLayout);
         tblListLayout.setHorizontalGroup(
@@ -108,40 +100,25 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(tblListLayout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblTimestamp, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel3)
-                                .addComponent(jScrollPane3)
-                                .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(34, Short.MAX_VALUE))
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(121, 121, 121))))
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel3)
+                    .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane3)
+                        .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         tblListLayout.setVerticalGroup(
             tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tblListLayout.createSequentialGroup()
-                .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addContainerGap(14, Short.MAX_VALUE)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lblAuthor)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(20, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTimestamp)
-                .addContainerGap())
+                .addGap(15, 15, 15))
         );
 
         lstJournals.setModel(new javax.swing.AbstractListModel<String>() {
@@ -257,7 +234,7 @@ public class Dashboard extends javax.swing.JFrame {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jScrollPane4)))
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         paneMenu.addTab("View Entry", mnuViewEntry);
@@ -538,33 +515,36 @@ public class Dashboard extends javax.swing.JFrame {
         }
     }
     
-        private void loadJournals(boolean showOnlyPersonalEntries) {
-            journalListModel.clear();
-            journalIds.clear();
+        private void loadJournals(boolean showOnlyPersonal) {
+    journalListModel.clear();
+    journalIds = new ArrayList<>();
+    String query;
+    if (showOnlyPersonal) {
+        query = "SELECT journal_id, title FROM Journals WHERE user_id = ?"; // Show only personal entries
+    } else {
+        query = "SELECT journal_id, title FROM Journals WHERE is_public = 1"; // Show only public entries
+    }
 
-            String query = showOnlyPersonalEntries ? 
-                "SELECT j.journal_id, j.title, j.content, u.username, j.date_created FROM journals j JOIN users u ON j.user_id = u.user_id WHERE j.user_id = ?" :
-                "SELECT j.journal_id, j.title, j.content, u.username, j.date_created FROM journals j JOIN users u ON j.user_id = u.user_id WHERE j.is_public = 1";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            try (Connection conn = DatabaseConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-
-                if (showOnlyPersonalEntries) {
-                    stmt.setInt(1, userAuth.getCurrentUserId());
-                }
-
-                try (ResultSet rs = stmt.executeQuery()) {
-                    while (rs.next()) {
-                        journalIds.add(rs.getInt("journal_id"));
-                        journalListModel.addElement(rs.getString("title"));
-                    }
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        if (showOnlyPersonal) {
+            stmt.setInt(1, userAuth.currentUserId); // Filter by the user's ID if showing personal entries
         }
 
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            int journalId = rs.getInt("journal_id");
+            String title = rs.getString("title");
+            journalListModel.addElement(title);
+            journalIds.add(journalId);
+        }
 
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "An error occurred while loading journals.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
         private void loadJournalEntry(int journalId) {
         String query = "SELECT title, content, user_id FROM Journals WHERE journal_id = ?"; 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -591,30 +571,13 @@ public class Dashboard extends javax.swing.JFrame {
     }
     
     private void lstJournalsValueChanged(javax.swing.event.ListSelectionEvent evt) {
-    int selectedIndex = lstJournals.getSelectedIndex();
-    if (selectedIndex != -1) {
-        int journalId = journalIds.get(selectedIndex);
-        String query = "SELECT j.title, j.content, u.username, j.date_created FROM Journals j JOIN Users u ON j.user_id = u.user_id WHERE j.journal_id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setInt(1, journalId);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    txtJournalTitle.setText(rs.getString("title"));
-                    txtJournalEntry.setText(rs.getString("content"));
-                    lblAuthor.setText("Author: " + rs.getString("username"));
-                    lblTimestamp.setText("Timestamp: " + rs.getTimestamp("date_created").toString());
-                }
+        if (!evt.getValueIsAdjusting()) {
+            int selectedIndex = lstJournals.getSelectedIndex();
+            if (selectedIndex != -1) {
+                loadJournalEntry(journalIds.get(selectedIndex));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-    }
-}
- 
+    }    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
@@ -633,8 +596,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JLabel lblAuthor;
-    private javax.swing.JLabel lblTimestamp;
     private javax.swing.JList<String> lstJournals;
     private javax.swing.JMenu mnuLogout;
     private javax.swing.JPanel mnuViewEntry;
