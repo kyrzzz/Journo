@@ -79,6 +79,17 @@ public class Dashboard extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        paneMenu.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                paneMenuMouseClicked(evt);
+            }
+        });
+        paneMenu.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent evt) {
+                paneMenuComponentShown(evt);
+            }
+        });
+
         tblList.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         txtJournalEntry.setColumns(20);
@@ -462,6 +473,16 @@ public class Dashboard extends javax.swing.JFrame {
             btnCancel.setEnabled(false);
         }
     }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void paneMenuComponentShown(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_paneMenuComponentShown
+        // TODO add your handling code here:
+        // loadJournals(chkShowOnlyPersonalEntries.isSelected());
+    }//GEN-LAST:event_paneMenuComponentShown
+
+    private void paneMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneMenuMouseClicked
+        // TODO add your handling code here:
+        loadJournals(chkShowOnlyPersonalEntries.isSelected());
+    }//GEN-LAST:event_paneMenuMouseClicked
 
     /**
      * @param args the command line arguments
