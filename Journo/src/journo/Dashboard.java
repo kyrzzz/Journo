@@ -56,6 +56,8 @@ public class Dashboard extends javax.swing.JFrame {
         txtJournalTitle = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        lblAuthor = new javax.swing.JLabel();
+        lblTimestamp = new javax.swing.JLabel();
         jScrollPane4 = new javax.swing.JScrollPane();
         lstJournals = new javax.swing.JList<>();
         jPanel1 = new javax.swing.JPanel();
@@ -93,32 +95,48 @@ public class Dashboard extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel4.setText("Journal Title:");
 
+        lblAuthor.setText("Author:");
+
+        lblTimestamp.setText("Timestamp:");
+
         javax.swing.GroupLayout tblListLayout = new javax.swing.GroupLayout(tblList);
         tblList.setLayout(tblListLayout);
         tblListLayout.setHorizontalGroup(
             tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tblListLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblTimestamp, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(117, 117, 117))
             .addGroup(tblListLayout.createSequentialGroup()
                 .addGap(29, 29, 29)
-                .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
+                .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel3)
-                    .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane3)
-                        .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane3)
+                    .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(tblListLayout.createSequentialGroup()
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblAuthor, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(34, Short.MAX_VALUE))
         );
         tblListLayout.setVerticalGroup(
             tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tblListLayout.createSequentialGroup()
-                .addContainerGap(20, Short.MAX_VALUE)
-                .addComponent(jLabel4)
+                .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tblListLayout.createSequentialGroup()
+                        .addContainerGap(13, Short.MAX_VALUE)
+                        .addComponent(jLabel4))
+                    .addGroup(tblListLayout.createSequentialGroup()
+                        .addComponent(lblAuthor)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTimestamp))
         );
 
         lstJournals.setModel(new javax.swing.AbstractListModel<String>() {
@@ -520,9 +538,9 @@ public class Dashboard extends javax.swing.JFrame {
     journalIds = new ArrayList<>();
     String query;
     if (showOnlyPersonal) {
-        query = "SELECT journal_id, title FROM Journals WHERE user_id = ?"; // Show only personal entries
+        query = "SELECT j.journal_id, j.title, j.content, u.username, j.date_created FROM journals j JOIN users u ON j.user_id = u.user_id WHERE j.user_id = ?"; // Show only personal entries
     } else {
-        query = "SELECT journal_id, title FROM Journals WHERE is_public = 1"; // Show only public entries
+        query =  "SELECT j.journal_id, j.title, j.content, u.username, j.date_created FROM journals j JOIN users u ON j.user_id = u.user_id WHERE j.is_public = 1"; // Show only public entries
     }
 
     try (Connection conn = DatabaseConnection.getConnection();
@@ -546,7 +564,7 @@ public class Dashboard extends javax.swing.JFrame {
     }
 }
         private void loadJournalEntry(int journalId) {
-        String query = "SELECT title, content, user_id FROM Journals WHERE journal_id = ?"; 
+        String query = "SELECT j.title, j.user_id, j.content, u.username, j.date_created FROM Journals j JOIN Users u ON j.user_id = u.user_id WHERE j.journal_id = ?"; 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
@@ -556,6 +574,8 @@ public class Dashboard extends javax.swing.JFrame {
             if (rs.next()) {
                 txtJournalTitle.setText(rs.getString("title"));
                 txtJournalEntry.setText(rs.getString("content"));
+                lblAuthor.setText("Author: " + rs.getString("username"));
+                lblTimestamp.setText("Timestamp: " + rs.getTimestamp("date_created").toString());
 
                 boolean isCurrentUserEntry = rs.getInt("user_id") == userAuth.getCurrentUserId();
                 btnEdit.setEnabled(isCurrentUserEntry);
@@ -596,6 +616,8 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JLabel lblAuthor;
+    private javax.swing.JLabel lblTimestamp;
     private javax.swing.JList<String> lstJournals;
     private javax.swing.JMenu mnuLogout;
     private javax.swing.JPanel mnuViewEntry;
