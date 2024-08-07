@@ -30,18 +30,25 @@ public class LoginForm extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 String username = txtUsername.getText();
                 String password = new String(txtPassword.getPassword());
+
                 if (userAuth.login(username, password)) {
-                    JOptionPane.showMessageDialog(null, "Login successful!\n\nLogged in as: " + userAuth.getCurrentUsername());
-                    //JOptionPane.showMessageDialog(null, "Logged in as: " + userAuth.getCurrentUsername());
-                    // Proceed to the next part of your application
-                                        SwingUtilities.invokeLater(new Runnable(){
-                    public void run(){
-                        String USERNAME = username;
-                        new Dashboard(userAuth).setVisible(true);
-                        }
-                    });
-                    dispose();
-                
+                    // Check if the user is an admin
+                    if (userAuth.isAdmin()) {
+                        JOptionPane.showMessageDialog(null, "Login successful!\n\nWelcome back, " + userAuth.getCurrentUsername() + " (Admin).");
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                new AdminView().setVisible(true);
+                            }
+                        });
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Login successful!\n\nLogged in as: " + userAuth.getCurrentUsername());
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                new Dashboard(userAuth).setVisible(true);
+                            }
+                        });
+                    }
+                    dispose(); // Close the login form
                 } else {
                     JOptionPane.showMessageDialog(null, "Invalid username or password.");
                 }
@@ -72,6 +79,11 @@ public class LoginForm extends javax.swing.JFrame {
         lblPassword.setText("Password");
 
         btnLogin.setText("LOGIN");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoginActionPerformed(evt);
+            }
+        });
 
         lblRegister.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         lblRegister.setForeground(new java.awt.Color(0, 51, 255));
@@ -124,6 +136,10 @@ public class LoginForm extends javax.swing.JFrame {
              new RegistrationForm().setVisible(true);
              this.setVisible(false);
     }//GEN-LAST:event_lblRegisterMouseClicked
+
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLoginActionPerformed
 
     /**
      * @param args the command line arguments

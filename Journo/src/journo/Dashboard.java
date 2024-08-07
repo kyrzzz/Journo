@@ -95,10 +95,16 @@ public class Dashboard extends javax.swing.JFrame {
         chkVisibility = new javax.swing.JCheckBox();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        lblUser = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         mnuLogout = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
 
         paneMenu.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -371,6 +377,9 @@ public class Dashboard extends javax.swing.JFrame {
 
         paneMenu.addTab("Write Entry", mnuWriteEntry);
 
+        lblUser.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblUser.setText("Hello, User");
+
         mnuLogout.setText("Logout");
         mnuLogout.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -389,11 +398,17 @@ public class Dashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(paneMenu)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblUser, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(27, 27, 27))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(32, Short.MAX_VALUE)
+                .addContainerGap(12, Short.MAX_VALUE)
+                .addComponent(lblUser)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(paneMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 547, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -515,6 +530,11 @@ public class Dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         loadJournals(chkShowOnlyPersonalEntries.isSelected());
     }//GEN-LAST:event_paneMenuMouseClicked
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+        lblUser.setText("Hello, " + userAuth.getCurrentUsername());
+    }//GEN-LAST:event_formWindowActivated
 
     /**
      * @param args the command line arguments
@@ -710,6 +730,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel lblJournalId;
     private javax.swing.JLabel lblSearch;
     private javax.swing.JLabel lblTimestamp;
+    private javax.swing.JLabel lblUser;
     private javax.swing.JList<String> lstJournals;
     private javax.swing.JMenu mnuLogout;
     private javax.swing.JPanel mnuViewEntry;

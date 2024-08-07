@@ -8,9 +8,10 @@ import javax.swing.JOptionPane;
 
 public class UserAuth {
     public int currentUserId;
+    private String currentUsername; // To store the username of the logged-in user
 
     public boolean login(String username, String password) {
-        String query = "SELECT user_id, password_hash FROM Users WHERE username = ?";
+        String query = "SELECT user_id, username, password_hash FROM Users WHERE username = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
@@ -21,6 +22,7 @@ public class UserAuth {
                 String storedHash = rs.getString("password_hash");
                 if (PasswordUtil.verifyPassword(password, storedHash)) {
                     currentUserId = rs.getInt("user_id");
+                    currentUsername = rs.getString("username"); // Store the username
                     return true;
                 }
             }
@@ -65,9 +67,6 @@ public class UserAuth {
         return false;
     }
 
-
-
-
     private boolean usernameExists(String username) {
         String query = "SELECT user_id FROM Users WHERE username = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -84,22 +83,9 @@ public class UserAuth {
         }
         return false;
     }
-    
+
     public String getCurrentUsername() {
-        String query = "SELECT username FROM Users WHERE user_id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            
-            stmt.setInt(1, currentUserId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                return rs.getString("username");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return currentUsername; // Return the stored username
     }
 
     public int getCurrentUserId() {
@@ -112,5 +98,11 @@ public class UserAuth {
 
     public void logout() {
         currentUserId = 0; // Reset the session
+        currentUsername = null; // Clear the username
+    }
+
+    // New method to check if the current user is an admin
+    public boolean isAdmin() {
+        return "admin".equals(currentUsername);
     }
 }
