@@ -43,6 +43,24 @@ public class Dashboard extends javax.swing.JFrame {
         lstJournals.setModel(journalListModel);
         lstJournals.addListSelectionListener(evt -> lstJournalsValueChanged(evt));
         btnSubmit.addActionListener(evt -> saveJournalEntry());
+        
+        txtSearch.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filterJournals();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filterJournals();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filterJournals();
+            }
+        });
+
     }
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -66,6 +84,8 @@ public class Dashboard extends javax.swing.JFrame {
         btnSave = new javax.swing.JButton();
         chkShowOnlyPersonalEntries = new javax.swing.JCheckBox();
         btnCancel = new javax.swing.JButton();
+        txtSearch = new javax.swing.JTextField();
+        lblSearch = new javax.swing.JLabel();
         mnuWriteEntry = new javax.swing.JPanel();
         txtTitle = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -121,7 +141,9 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(tblListLayout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel3)
+                    .addGroup(tblListLayout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(24, 24, 24))
                     .addComponent(jScrollPane3)
                     .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 765, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(tblListLayout.createSequentialGroup()
@@ -133,19 +155,16 @@ public class Dashboard extends javax.swing.JFrame {
         tblListLayout.setVerticalGroup(
             tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, tblListLayout.createSequentialGroup()
+                .addGap(16, 16, 16)
                 .addGroup(tblListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addContainerGap(13, Short.MAX_VALUE)
-                        .addComponent(jLabel4))
-                    .addGroup(tblListLayout.createSequentialGroup()
-                        .addComponent(lblAuthor)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblAuthor, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(18, 18, 18)
                 .addComponent(txtJournalTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTimestamp))
         );
@@ -210,7 +229,7 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkShowOnlyPersonalEntries, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(126, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(25, 25, 25)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -240,6 +259,8 @@ public class Dashboard extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        lblSearch.setText("Search by title");
+
         javax.swing.GroupLayout mnuViewEntryLayout = new javax.swing.GroupLayout(mnuViewEntry);
         mnuViewEntry.setLayout(mnuViewEntryLayout);
         mnuViewEntryLayout.setHorizontalGroup(
@@ -247,23 +268,33 @@ public class Dashboard extends javax.swing.JFrame {
             .addGroup(mnuViewEntryLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(tblList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(mnuViewEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(12, 12, 12))
+                    .addGroup(mnuViewEntryLayout.createSequentialGroup()
+                        .addGroup(mnuViewEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane4)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtSearch))
+                        .addGap(18, 18, 18))
+                    .addGroup(mnuViewEntryLayout.createSequentialGroup()
+                        .addComponent(lblSearch)
+                        .addContainerGap(281, Short.MAX_VALUE))))
         );
         mnuViewEntryLayout.setVerticalGroup(
             mnuViewEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mnuViewEntryLayout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(mnuViewEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(tblList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, mnuViewEntryLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(mnuViewEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(mnuViewEntryLayout.createSequentialGroup()
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane4)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                        .addComponent(lblSearch)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tblList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         paneMenu.addTab("View Entry", mnuViewEntry);
@@ -334,7 +365,7 @@ public class Dashboard extends javax.swing.JFrame {
                 .addGroup(mnuWriteEntryLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chkVisibility)
                     .addComponent(btnSubmit, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
 
         paneMenu.addTab("Write Entry", mnuWriteEntry);
@@ -361,8 +392,8 @@ public class Dashboard extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(51, Short.MAX_VALUE)
-                .addComponent(paneMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(32, Short.MAX_VALUE)
+                .addComponent(paneMenu, javax.swing.GroupLayout.PREFERRED_SIZE, 547, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -618,7 +649,43 @@ public class Dashboard extends javax.swing.JFrame {
                 loadJournalEntry(journalIds.get(selectedIndex));
             }
         }
-    }    
+    }
+
+    private void filterJournals() {
+    String searchText = txtSearch.getText().toLowerCase();
+    journalListModel.clear();
+
+    String query = "SELECT title FROM Journals WHERE LOWER(title) LIKE ?";
+
+    // Adjust query to filter based on public/private and user's journals
+    if (chkShowOnlyPersonalEntries.isSelected()) {
+        query = "SELECT title FROM Journals WHERE user_id = ? AND LOWER(title) LIKE ?";
+    } else {
+        query = "SELECT title FROM Journals WHERE (user_id = ? OR is_public = '1') AND LOWER(title) LIKE ?";
+    }
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+        if (chkShowOnlyPersonalEntries.isSelected()) {
+            stmt.setInt(1, userAuth.getCurrentUserId()); // Assuming you have a method to get the current user's ID
+            stmt.setString(2, "%" + searchText + "%");
+        } else {
+            stmt.setInt(1, userAuth.getCurrentUserId()); // User ID for filtering
+            stmt.setString(2, "%" + searchText + "%");
+        }
+
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String title = rs.getString("title");
+                journalListModel.addElement(title);
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "An error occurred while searching for journals.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
@@ -638,6 +705,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblAuthor;
+    private javax.swing.JLabel lblSearch;
     private javax.swing.JLabel lblTimestamp;
     private javax.swing.JList<String> lstJournals;
     private javax.swing.JMenu mnuLogout;
@@ -648,6 +716,7 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JTextArea txtContent;
     private javax.swing.JTextArea txtJournalEntry;
     private javax.swing.JTextField txtJournalTitle;
+    private javax.swing.JTextField txtSearch;
     private javax.swing.JTextField txtTitle;
     // End of variables declaration//GEN-END:variables
 }
